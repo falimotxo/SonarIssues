@@ -121,6 +121,7 @@ print('INFO - {} : Parámetros de configuración de búsqueda de incidencias obt
 print('INFO - {} : Obteniendo usuarios'.format(datetime.datetime.now().strftime('%H:%M:%S %d/%m/%Y')))
 
 listUsers = []
+listResp = []
 mapGroupUsers = dict()
 mapRespUsers = dict()
 for item in config.items("USERS_GROUP"):
@@ -128,9 +129,9 @@ for item in config.items("USERS_GROUP"):
     users_resp = item[1]
 
     #A los responsables no se le genera informe
-    #for i in resp.split(','):
-        #if i not in listUsers:
-            #listUsers.append(i)
+    for i in resp.split(','):
+        if i not in listResp:
+            listResp.append(i)
 
     for i in users_resp.split(','):
         if i not in listUsers:
@@ -140,7 +141,7 @@ for item in config.items("USERS_GROUP"):
 
     mapGroupUsers[resp] = users_resp
 
-if(len(listUsers) <= 0 or len(mapGroupUsers) <= 0):
+if(len(listUsers) <= 0 or len(listResp) <= 0 or len(mapGroupUsers) <= 0):
     print('ERROR - {} : Usuarios no definidos en el archivo de configuración'.format(datetime.datetime.now().strftime('%H:%M:%S %d/%m/%Y')))
     exit(1)
 
@@ -183,6 +184,18 @@ mapMessageByUser = dict()
 mapInfoUser = dict()
 # Mapa <Usuario - debito acumulado> para almacenar la información de débito por usuario
 mapDebtByUser = dict()
+
+for resp in listResp:
+    payload = {'q': resp}
+    response = requests.get('https://qamind.indra.es/api/users/search', params=payload, auth=(user_sonar, password_sonar), verify=False)
+    if response.status_code == 200:
+        data = response.json()
+
+        if data['total'] == 1:
+            person = ''
+            for i in data['users']:
+                person = User.as_payload(i)
+                mapInfoUser[resp] = person
 
 for user in listUsers:
     payload = {'q': user}
