@@ -215,7 +215,9 @@ for user in listUsers:
             if response.status_code == 200:
                 print('INFO - {} : ****** Iniciando generación de informe para el usuario {} ******'.format(datetime.datetime.now().strftime('%H:%M:%S %d/%m/%Y'), user))
                 messageHtml = '<h1>Informe Incidencias Sonar</h1>'
-                messageComunHtml = '<h4>Usuario: ' + person.name + ' (' + user + ')</h4>'
+
+                messageComunHtml = '<table border="1" style="border-collapse: collapse; border: 1px solid black;"><tr>'
+                messageComunHtml += '<th colspan="3" style="background-color: #00bfff;">Usuario: ' + person.name + ' (' + user + ')</th></tr>'
 
                 data = response.json()
 
@@ -225,7 +227,7 @@ for user in listUsers:
                 if total % ps > 0:
                     num_pages += 1
 
-                messageComunHtml += '<p><b>Total incidencias en periodo de observacion (' + strCreatedInLast + '): ' + str(total) + '</p></b>'
+                messageComunHtml += '<tr style="font-weight: bold;"><td>Total incidencias en periodo de observacion (' + strCreatedInLast + ')</td><td style="width: 25px; text-align: center;"> ' + str(total) + '</td></tr>'
 
                 issueList = []
                 for i in data['issues']:
@@ -243,11 +245,12 @@ for user in listUsers:
 
                 numIssuesBlocker = issueSonar.getNumIssuesBlocker()
                 numIssuesCritical = issueSonar.getNumIssuesCritical()
-                messageComunHtml += '<p><b><font color="red">Número de incidencias BLOCKER: ' + str(numIssuesBlocker) + '</font></b></p>'
-                messageComunHtml += '<p><b><font color="red">Número de incidencias CRITICAL: ' + str(numIssuesCritical) + '</font></b></p>'
-                messageComunHtml += '<p><b>Número de incidencias MAJOR: ' + str(issueSonar.getNumIssuesMajor()) + '</b></p>'
-                messageComunHtml += '<p><b>Número de incidencias MINOR: ' + str(issueSonar.getNumIssuesMinor()) + '</b></p>'
-                messageComunHtml += '<p><b>Número de incidencias INFO: ' +  str(issueSonar.getNumIssuesInfo()) + '</b></p>'
+                messageComunHtml += '<tr style="font-weight: bold; color: red;"><td>Número de incidencias BLOCKER</td><td style="width: 25px; text-align: center;">' + str(numIssuesBlocker) + '</td></tr>'
+                messageComunHtml += '<tr style="font-weight: bold; color: red;"><td>Número de incidencias CRITICAL</td><td style="width: 25px; text-align: center;">' + str(numIssuesCritical) + '</td></tr>'
+                messageComunHtml += '<tr><td style="">Número de incidencias MAJOR</td><td style="width: 25px; text-align: center;">' + str(issueSonar.getNumIssuesMajor()) + '</td></tr>'
+                messageComunHtml += '<tr><td style="">Número de incidencias MINOR</td><td style="width: 25px; text-align: center;">' + str(issueSonar.getNumIssuesMinor()) + '</td></tr>'
+                messageComunHtml += '<tr><td style="">Número de incidencias INFO</td><td style="width: 25px; text-align: center;">' +  str(issueSonar.getNumIssuesInfo()) + '</td></tr>'
+                messageComunHtml += '</table>'
 
                 messageHtml += messageComunHtml
                 messageHtml += '<dl><dt><b>Clases afectadas:</b></dt>'
